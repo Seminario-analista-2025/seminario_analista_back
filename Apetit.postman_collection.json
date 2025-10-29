@@ -1,0 +1,69 @@
+{
+	"info": {
+		"_postman_id": "a5db4c7e-31fa-4deb-8cbe-695a32109d4d",
+		"name": "Apetit",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5122382",
+		"_collection_link": "https://crimson-meadow-285815.postman.co/workspace/Team-Workspace~1ee4f538-ed8e-43a5-8c02-34197e8982a2/collection/5122382-a5db4c7e-31fa-4deb-8cbe-695a32109d4d?action=share&source=collection_link&creator=5122382"
+	},
+	"item": [
+		{
+			"name": "health",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "users",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "restaurants",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/reservations",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"restaurantId\":\"<ID>\",\"date\":\"2025-10-28T00:00:00.000Z\",\"slot\":\"20:00\",\"partySize\":2}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/reservations",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"reservations"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:3000/reservations \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\"restaurantId\":\"<ID>\",\"date\":\"2025-10-28T00:00:00.000Z\",\"slot\":\"20:00\",\"partySize\":2}'\r\n"
+			},
+			"response": []
+		}
+	]
+}
