@@ -78,56 +78,22 @@ API disponible en: [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## 🔌 Endpoints disponibles
-
-### 🩺 Healthcheck
-
-```http
-GET /health
-```
-
-Respuesta:
-
-```json
-{ "ok": true }
-```
-
-### 👥 Usuarios (hardcodeados)
-
-```http
-GET /users
-```
-
-### 🍽️ Restaurantes
-
-```http
-GET /restaurants
-```
-
-Parámetros opcionales:
-
-```
-?cuisines=Japonesa&maxPrice=30
-```
-
-### 📅 Crear reserva
-
-```http
-POST /reservations
-Content-Type: application/json
-```
-
-Body ejemplo:
-
-```json
-{
-  "restaurantId": "<ID_DE_UN_RESTAURANTE>",
-  "date": "2025-10-28T00:00:00.000Z",
-  "slot": "20:00",
-  "partySize": 2
-}
-```
-
+🔌 API Endpoints – Resumen
+Método	Endpoint	Descripción
+🩺 GET	/health	Verifica el estado del servidor.
+👥 GET	/users	Devuelve usuarios disponibles (mockeados). Soporta filtros (exclude, availableOnly).
+⚙️ PUT	/users/:userId/preferences	Actualiza preferencias del usuario.
+⚙️ GET	/users/:userId/preferences	Obtiene las preferencias guardadas.
+🍽️ GET	/restaurants	Lista restaurantes con filtros (cuisines, maxPrice). Incluye photoUrl.
+📅 POST	/reservations	Crea una reserva manual indicando restaurante, fecha, hora y cantidad.
+🧭 GET	/groups/:userId	Lista los grupos en los que participa o coordina el usuario.
+🧭 POST	/groups	Crea un nuevo grupo con fecha, hora, lugar y límite de integrantes.
+📨 POST	/groups/:groupId/invite	Invita a un usuario al grupo.
+👥 POST	/groups/:groupId/join	Permite que un usuario se una a un grupo existente.
+🧩 GET	/group-view/:groupId	Muestra la vista completa del grupo: miembros, preferencias, sugerencias y votos.
+👍 POST	/groups/:groupId/votes	Registra o actualiza el voto de un usuario (positivo o negativo).
+👍 GET	/groups/:groupId/votes?userId=<id>	Obtiene el conteo de votos y el voto del usuario.
+🧾 POST	/groups/:groupId/reserve	El coordinador realiza la reserva final para el grupo.
 ---
 
 ## 🗂️ Estructura del proyecto
