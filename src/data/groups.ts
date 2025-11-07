@@ -20,6 +20,7 @@ export type Group = {
   date?: string;               // "YYYY-MM-DD"
   time?: string;               // "HH:mm"
   placeHint?: string;          // opcional: barrio/zona
+  limit: number; 
 };
 
 export const GROUPS: Group[] = [
