@@ -17,9 +17,38 @@
 		},
 		{
 			"name": "users",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
 			"request": {
 				"method": "GET",
-				"header": []
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"userId\": \"u2\", \"restaurantId\": \"cmhgnrn3d0002w32q7l4jh4nj\"}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/users?exclude=u1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users"
+					],
+					"query": [
+						{
+							"key": "exclude",
+							"value": "u1"
+						}
+					]
+				}
 			},
 			"response": []
 		},
@@ -103,6 +132,27 @@
 			"response": []
 		},
 		{
+			"name": "http://localhost:3000/groups/u1",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/groups/u1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"groups",
+						"u1"
+					]
+				},
+				"description": "Generated from cURL: curl http://localhost:3000/groups/u1\r\n"
+			},
+			"response": []
+		},
+		{
 			"name": "http://localhost:3000/groups",
 			"request": {
 				"method": "POST",
@@ -114,7 +164,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \"name\":\"Salida Demo\", \"coordinatorId\":\"u1\", \"date\":\"2025-11-05\", \"time\":\"21:00\", \"placeHint\":\"Centro\" }",
+					"raw": "{\r\n  \"name\": \"Salida Demo\",\r\n  \"coordinatorId\": \"u1\",\r\n  \"date\": \"2025-11-05\",\r\n  \"time\": \"21:00\",\r\n  \"placeHint\": \"Centro\",\r\n  \"limit\": 4\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -225,6 +275,48 @@
 					]
 				},
 				"description": "Generated from cURL: curl -X POST http://localhost:3000/auth/login \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\"email\":\"ana@example.com\",\"password\":\"123456\"}'\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "todos los grupos por usuario",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/group-view/all/u1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"group-view",
+						"all",
+						"u1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/groups/u2",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/groups/u2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"groups",
+						"u2"
+					]
+				},
+				"description": "Generated from cURL: curl http://localhost:3000/groups/u2\r\n"
 			},
 			"response": []
 		},
@@ -413,7 +505,7 @@
 			"response": []
 		},
 		{
-			"name": "http://localhost:3000/groups/g1/confirm",
+			"name": "votar a favor",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -424,7 +516,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"userId\": \"u2\", \"restaurantId\": \"cmhgnrn3d0002w32q7l4jh4nj\"}",
+					"raw": "{\"userId\":\"u2\",\"restaurantId\":\"<ID_R3>\",\"value\":\"up\"}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -432,7 +524,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/groups/g1/confirm",
+					"raw": "http://localhost:3000/groups/g1/votes",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -441,20 +533,34 @@
 					"path": [
 						"groups",
 						"g1",
-						"confirm"
+						"votes"
 					]
 				},
-				"description": "Generated from cURL: curl -X POST http://localhost:3000/groups/g1/confirm \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\"userId\": \"u2\", \"restaurantId\": \"cmhgnrn3d0002w32q7l4jh4nj\"}'"
+				"description": "Generated from cURL: curl -X POST http://localhost:3000/groups/g1/votes \\\r\n -H \"Content-Type: application/json\" \\\r\n -d '{\"userId\":\"u2\",\"restaurantId\":\"<ID_R3>\",\"value\":\"up\"}'\r\n"
 			},
 			"response": []
 		},
 		{
-			"name": "http://localhost:3000/groups/g1/confirmations",
+			"name": "votar en contra",
 			"request": {
-				"method": "GET",
-				"header": [],
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"userId\":\"u1\",\"restaurantId\":\"<ID_R2>\",\"value\":\"down\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "http://localhost:3000/groups/g1/confirmations",
+					"raw": "http://localhost:3000/groups/g1/votes",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -463,15 +569,70 @@
 					"path": [
 						"groups",
 						"g1",
-						"confirmations"
+						"votes"
 					]
 				},
-				"description": "Generated from cURL: curl http://localhost:3000/groups/g1/confirmations"
+				"description": "Generated from cURL: curl -X POST http://localhost:3000/groups/g1/votes \\\r\n -H \"Content-Type: application/json\" \\\r\n -d '{\"userId\":\"u1\",\"restaurantId\":\"<ID_R2>\",\"value\":\"down\"}'\r\n"
 			},
 			"response": []
 		},
 		{
-			"name": "http://localhost:3000/reservations",
+			"name": "ver conteos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/groups/g1/votes?userId=u2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"groups",
+						"g1",
+						"votes"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "u2"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl \"http://localhost:3000/groups/g1/votes?userId=u2\"\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "ver group view con votos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/group-view/g1?userId=u2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"group-view",
+						"g1"
+					],
+					"query": [
+						{
+							"key": "userId",
+							"value": "u2"
+						}
+					]
+				},
+				"description": "Generated from cURL: curl \"http://localhost:3000/group-view/g1?userId=u2\"\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:3000/groups/g1/reserve",
 			"request": {
 				"method": "POST",
 				"header": [
@@ -482,7 +643,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"restaurantId\":\"<ID>\",\"date\":\"2025-10-28T00:00:00.000Z\",\"slot\":\"20:00\",\"partySize\":2}",
+					"raw": "{\r\n    \"coordinatorId\": \"u1\",\r\n    \"restaurantId\": \"<ID_R3>\",\r\n    \"note\": \"Mesa afuera si se puede\"\r\n  }",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -490,27 +651,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/reservations",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"reservations"
-					]
-				},
-				"description": "Generated from cURL: curl -X POST http://localhost:3000/reservations \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\"restaurantId\":\"<ID>\",\"date\":\"2025-10-28T00:00:00.000Z\",\"slot\":\"20:00\",\"partySize\":2}'\r\n"
-			},
-			"response": []
-		},
-		{
-			"name": "http://localhost:3000/groups/u1",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/groups/u1",
+					"raw": "http://localhost:3000/groups/g1/reserve",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -518,65 +659,11 @@
 					"port": "3000",
 					"path": [
 						"groups",
-						"u1"
+						"g1",
+						"reserve"
 					]
 				},
-				"description": "Generated from cURL: curl http://localhost:3000/groups/u1\r\n"
-			},
-			"response": []
-		},
-		{
-			"name": "http://localhost:3000/groups",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\"name\":\"Salida Demo\",\"coordinatorId\":\"u1\",\"members\":[\"u2\"]}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:3000/groups",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"groups"
-					]
-				},
-				"description": "Generated from cURL: curl -X POST http://localhost:3000/groups \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\"name\":\"Salida Demo\",\"coordinatorId\":\"u1\",\"members\":[\"u2\"]}'"
-			},
-			"response": []
-		},
-		{
-			"name": "http://localhost:3000/groups/u2",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/groups/u2",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"groups",
-						"u2"
-					]
-				},
-				"description": "Generated from cURL: curl http://localhost:3000/groups/u2\r\n"
+				"description": "Generated from cURL: curl -X POST http://localhost:3000/groups/g1/reserve \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\r\n    \"coordinatorId\": \"u1\",\r\n    \"restaurantId\": \"<ID_R3>\",\r\n    \"note\": \"Mesa afuera si se puede\"\r\n  }'"
 			},
 			"response": []
 		}

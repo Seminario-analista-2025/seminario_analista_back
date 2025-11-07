@@ -17,6 +17,7 @@ model Restaurant {
   accessibility String[]
   availability  Availability[]
   reservations  Reservation[]
+  photoUrl      String?
 }
 
 model Availability {

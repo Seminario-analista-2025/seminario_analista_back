@@ -14,7 +14,8 @@ const r1 = await prisma.restaurant.create({
     avgPrice: 25,
     location: { lat: -31.4, lng: -64.18, address: "Calle 123, Córdoba" },
     noiseLevel: "bajo", // 👈 tranquilo
-    accessibility: ["ramp", "restroom", "gluten-free"], // 👈 apto celíacos
+    accessibility: ["ramp", "restroom", "gluten-free"],
+    photoUrl: "https://i.pinimg.com/1200x/b4/fa/ea/b4faea413da984b5c6723be19572063e.jpg"
   },
 });
 
@@ -26,7 +27,8 @@ const r2 = await prisma.restaurant.create({
     avgPrice: 20,
     location: { lat: -31.41, lng: -64.19, address: "Av. 456, Córdoba" },
     noiseLevel: "medio",
-    accessibility: ["ramp", "vegetarian"], // 👈 vegetariano
+    accessibility: ["ramp", "vegetarian"],
+    photoUrl: "https://i.pinimg.com/1200x/c7/68/e6/c768e6ab9455d6b0b3b8732ef1ac9215.jpg"
   },
 });
 
@@ -38,13 +40,14 @@ const r3 = await prisma.restaurant.create({
     avgPrice: 30,
     location: { lat: -31.42, lng: -64.20, address: "Av. Las Flores 789, Córdoba" },
     noiseLevel: "bajo", // tranquilo
-    accessibility: ["ramp", "restroom", "gluten-free", "vegetarian"], // cumple ambas dietas
+    accessibility: ["ramp", "restroom", "gluten-free", "vegetarian"],
+    photoUrl: "https://i.pinimg.com/736x/2b/1d/f1/2b1df159ca331b71104b2d0f8c1a4863.jpg"
   },
 });
 
   const today = new Date();
-  const date = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
-  const slots = ["20:00", "21:30"];
+  const date = new Date("2025-11-05T00:00:00Z");
+  const slots = ["20:00", "21:00"];
 
   for (const slot of slots) {
     await prisma.availability.create({ data: { restaurantId: r1.id, date, slot, capacity: 6 } });
