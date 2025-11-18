@@ -46,7 +46,7 @@ const r3 = await prisma.restaurant.create({
 });
 
   const today = new Date();
-  const date = new Date("2025-11-05T00:00:00Z");
+  const date = new Date("2025-12-06T00:00:00Z");
   const slots = ["20:00", "21:00"];
 
   for (const slot of slots) {

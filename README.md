@@ -122,7 +122,7 @@ Body ejemplo:
 ```json
 {
   "restaurantId": "<ID_DE_UN_RESTAURANTE>",
-  "date": "2025-10-28T00:00:00.000Z",
+  "date": "2025-12-06T00:00:00.000Z",
   "slot": "20:00",
   "partySize": 2
 }

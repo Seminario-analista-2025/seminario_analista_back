@@ -61,6 +61,76 @@
 			"response": []
 		},
 		{
+			"name": "register",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"ana@example.com\",\r\n  \"password\": \"123456\",\r\n  \"name\": \"Ana\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"auth",
+						"register"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:3000/auth/login \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\"email\":\"ana@example.com\",\"password\":\"123456\"}'\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "register Bruno",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"bruno@example.com\",\r\n  \"password\": \"123456\",\r\n  \"name\": \"Bruno\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/auth/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"auth",
+						"register"
+					]
+				},
+				"description": "Generated from cURL: curl -X POST http://localhost:3000/auth/login \\\r\n  -H \"Content-Type: application/json\" \\\r\n  -d '{\"email\":\"ana@example.com\",\"password\":\"123456\"}'\r\n"
+			},
+			"response": []
+		},
+		{
 			"name": "http://localhost:3000/auth/login",
 			"request": {
 				"method": "POST",
@@ -164,7 +234,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"name\": \"Salida Demo\",\r\n  \"coordinatorId\": \"u1\",\r\n  \"date\": \"2025-11-05\",\r\n  \"time\": \"21:00\",\r\n  \"placeHint\": \"Centro\",\r\n  \"limit\": 4\r\n}",
+					"raw": "{\r\n  \"name\": \"Salida Demo\",\r\n  \"coordinatorId\": \"u1\",\r\n  \"date\": \"2025-12-06\",\r\n  \"time\": \"21:00\",\r\n  \"placeHint\": \"Centro\",\r\n  \"limit\": 4\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -255,7 +325,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"email\":\"ana@example.com\",\"password\":\"123456\"}",
+					"raw": "{\"email\":\"bruno@example.com\",\"password\":\"123456\"}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -284,7 +354,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/group-view/all/u1",
+					"raw": "http://localhost:3000/group-view/all/u2",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -293,7 +363,7 @@
 					"path": [
 						"group-view",
 						"all",
-						"u1"
+						"u2"
 					]
 				}
 			},
@@ -439,7 +509,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/restaurants/<ID>",
+					"raw": "http://localhost:3000/restaurants/cmi54ajtw00025dux8nmehyy6",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -447,7 +517,7 @@
 					"port": "3000",
 					"path": [
 						"restaurants",
-						"<ID>"
+						"cmi54ajtw00025dux8nmehyy6"
 					]
 				},
 				"description": "Generated from cURL: curl \"http://localhost:3000/restaurants/<ID>\""
@@ -460,7 +530,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/restaurants/<ID>/menu",
+					"raw": "http://localhost:3000/restaurants/cmi54ajtw00025dux8nmehyy6/menu",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -468,7 +538,7 @@
 					"port": "3000",
 					"path": [
 						"restaurants",
-						"<ID>",
+						"cmi54ajtw00025dux8nmehyy6",
 						"menu"
 					]
 				},
@@ -482,7 +552,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:3000/restaurants/<ID>/reviews?top=2",
+					"raw": "http://localhost:3000/restaurants/cmi54ajtw00025dux8nmehyy6/reviews?top=2",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -490,7 +560,7 @@
 					"port": "3000",
 					"path": [
 						"restaurants",
-						"<ID>",
+						"cmi54ajtw00025dux8nmehyy6",
 						"reviews"
 					],
 					"query": [
@@ -516,7 +586,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"userId\":\"u2\",\"restaurantId\":\"<ID_R3>\",\"value\":\"up\"}",
+					"raw": "{\"userId\":\"u2\",\"restaurantId\":\"cmi54ajtw00025dux8nmehyy6\",\"value\":\"up\"}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -643,7 +713,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"coordinatorId\": \"u1\",\r\n    \"restaurantId\": \"<ID_R3>\",\r\n    \"note\": \"Mesa afuera si se puede\"\r\n  }",
+					"raw": "{\r\n    \"coordinatorId\": \"u1\",\r\n    \"restaurantId\": \"cmi54ajtw00025dux8nmehyy6\",\r\n    \"note\": \"Mesa afuera si se puede\"\r\n  }",
 					"options": {
 						"raw": {
 							"language": "json"
