@@ -78,6 +78,55 @@ API disponible en: [http://localhost:3000](http://localhost:3000)
 
 ---
 
+## 🔌 Endpoints disponibles
+
+### 🩺 Healthcheck
+
+```http
+GET /health
+```
+
+Respuesta:
+
+```json
+{ "ok": true }
+```
+
+### 👥 Usuarios (hardcodeados)
+
+```http
+GET /users
+```
+
+### 🍽️ Restaurantes
+
+```http
+GET /restaurants
+```
+
+Parámetros opcionales:
+
+```
+?cuisines=Japonesa&maxPrice=30
+```
+
+### 📅 Crear reserva
+
+```http
+POST /reservations
+Content-Type: application/json
+```
+
+Body ejemplo:
+
+```json
+{
+  "restaurantId": "<ID_DE_UN_RESTAURANTE>",
+  "date": "2025-12-06T00:00:00.000Z",
+  "slot": "20:00",
+  "partySize": 2
+}
+```
 🔌 API Endpoints – Resumen
 | Método      | Endpoint                             | Descripción                                                                              |
 | :---------- | :----------------------------------- | :--------------------------------------------------------------------------------------- |
