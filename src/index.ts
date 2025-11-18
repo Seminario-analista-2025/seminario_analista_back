@@ -652,3 +652,32 @@ app.post("/groups/:groupId/reserve", async (req: Request, res: Response) => {
     remainingCapacity: availability.capacity - partySize
   });
 });
+
+// Registrar nuevo usuario
+app.post("/auth/register", (req: Request, res: Response) => {
+  const schema = z.object({
+    email: z.string().email(),
+    password: z.string().min(6),
+    name: z.string().min(1)
+  });
+
+  const parsed = schema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json(parsed.error.flatten());
+
+  const { email, password, name } = parsed.data;
+
+  // Validar si ya existe
+  if (USERS.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+    return res.status(409).json({ error: "El correo ya está registrado" });
+  }
+
+  // Crear ID simple incremental
+  const id = `u${USERS.length + 1}`;
+
+  USERS.push({ id, email, password, name });
+
+  return res.status(201).json({
+    message: "Usuario registrado",
+    user: { id, email, name }
+  });
+});

@@ -6,7 +6,4 @@ export type DemoUser = {
   password: string; // ⚠️ DEMO: solo para pruebas, no usar en prod
 };
 
-export const USERS: DemoUser[] = [
-  { id: "u1", email: "ana@example.com",   name: "Ana",   password: "123456" },
-  { id: "u2", email: "bruno@example.com", name: "Bruno", password: "123456" }
-];
+export const USERS: DemoUser[] = [];
