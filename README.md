@@ -127,6 +127,23 @@ Body ejemplo:
   "partySize": 2
 }
 ```
+🔌 API Endpoints – Resumen
+| Método      | Endpoint                             | Descripción                                                                              |
+| :---------- | :----------------------------------- | :--------------------------------------------------------------------------------------- |
+| 🩺 **GET**  | `/health`                            | Verifica el estado del servidor.                                                         |
+| 👥 **GET**  | `/users`                             | Devuelve usuarios disponibles (mockeados). Soporta filtros (`exclude`, `availableOnly`). |
+| ⚙️ **PUT**  | `/users/:userId/preferences`         | Actualiza las preferencias del usuario.                                                  |
+| ⚙️ **GET**  | `/users/:userId/preferences`         | Obtiene las preferencias guardadas.                                                      |
+| 🍽️ **GET** | `/restaurants`                       | Lista restaurantes con filtros (`cuisines`, `maxPrice`) e incluye `photoUrl`.            |
+| 📅 **POST** | `/reservations`                      | Crea una reserva manual indicando restaurante, fecha, hora y cantidad.                   |
+| 🧭 **GET**  | `/groups/:userId`                    | Lista los grupos en los que participa o coordina el usuario.                             |
+| 🧭 **POST** | `/groups`                            | Crea un nuevo grupo con fecha, hora, lugar y límite de integrantes.                      |
+| 📨 **POST** | `/groups/:groupId/invite`            | Invita a un usuario al grupo.                                                            |
+| 👥 **POST** | `/groups/:groupId/join`              | Permite que un usuario se una a un grupo existente.                                      |
+| 🧩 **GET**  | `/group-view/:groupId`               | Muestra la vista completa del grupo (miembros, preferencias, sugerencias y votos).       |
+| 👍 **POST** | `/groups/:groupId/votes`             | Registra o actualiza el voto de un usuario (positivo o negativo).                        |
+| 👍 **GET**  | `/groups/:groupId/votes?userId=<id>` | Devuelve el conteo de votos y el voto del usuario.                                       |
+| 🧾 **POST** | `/groups/:groupId/reserve`           | El coordinador realiza la reserva final para el grupo.                                   |
 
 ---
 
