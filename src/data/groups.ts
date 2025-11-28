@@ -11,6 +11,25 @@ export const ADDRESSES: Address[] = [
   { id: "a2", userId: "u2", label: "Departamento", address: "Calle Falsa 123" }
 ];
 
+export type GroupReservation = {
+  id: string;
+  restaurantId: string;
+  date: string;
+  time: string;
+  note?: string;
+  partySize: number;
+  restaurant?: {
+    id: string;
+    name: string;
+    cuisines: string[];
+    avgPrice: number | null;
+    location: Record<string, unknown>;
+    noiseLevel?: string | null;
+    accessibility: string[];
+    photoUrl?: string | null;
+  };
+};
+
 export type Group = {
   id: string;
   name: string;
@@ -20,7 +39,8 @@ export type Group = {
   date?: string;               // "YYYY-MM-DD"
   time?: string;               // "HH:mm"
   placeHint?: string;          // opcional: barrio/zona
-  limit: number; 
+  limit: number;
+  reservation?: GroupReservation;
 };
 
 export const GROUPS: Group[] = [

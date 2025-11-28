@@ -1,16 +1,29 @@
 import express, { Request, Response } from "express";
+import cors from "cors";
 import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
 import { USERS } from "./data/users.ts";
 import { ADDRESSES, GROUPS, Group } from "./data/groups.ts";
 import { PREFS, UserPrefs } from "./data/prefs.ts";
 import { MENUS_BY_NAME, REVIEWS_BY_NAME } from "./data/restaurantExtras.ts";
-import { VOTES, VoteValue } from "./data/votes.ts ";
+import { VOTES, VoteValue } from "./data/votes.ts";
+import { SUGGESTIONS } from "./data/suggestions.ts";
 
 const app = express();
+
+// CORS configuration from environment variables
+const corsOrigins = process.env.CORS_ORIGINS 
+  ? process.env.CORS_ORIGINS.split(',').map(origin => origin.trim())
+  : ['http://localhost:5173', 'http://localhost:3000'];
+
+app.use(cors({
+  origin: corsOrigins,
+  credentials: true
+}));
 app.use(express.json());
 const prisma = new PrismaClient();
 const PORT = Number(process.env.PORT ?? 3000);
+const API_BASE_URL = process.env.API_BASE_URL ?? `http://localhost:${PORT}`;
 
 app.get("/health", (_req: Request, res: Response) => res.json({ ok: true }));
 
@@ -83,7 +96,7 @@ app.post("/reservations", async (req: Request, res: Response) => {
   res.status(201).json(reservation);
 });
 
-app.listen(PORT, () => console.log(`API demo en http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`API demo en ${API_BASE_URL}`));
 
 
 // Login de demo (sin tokens)
@@ -376,18 +389,78 @@ const myVotes = viewerUserId
     }, {})
   : {};
 
-// anexar conteos a cada sugerencia
-const suggestionsWithVotes = suggestions.map(s => ({
-  ...s,
-  votes: { ...(voteCounts[s.id] ?? { up: 0, down: 0 }) },
-  myVote: viewerUserId ? myVotes[s.id] ?? null : null
-}));
+// Obtener sugerencias manuales de este grupo
+const groupSuggestions = SUGGESTIONS.filter(s => s.groupId === groupId);
+const suggestedByMap: Record<string, string[]> = {}; // restaurantId -> [userId1, userId2, ...]
+
+for (const suggestion of groupSuggestions) {
+  if (!suggestedByMap[suggestion.restaurantId]) {
+    suggestedByMap[suggestion.restaurantId] = [];
+  }
+  suggestedByMap[suggestion.restaurantId].push(suggestion.userId);
+}
+
+// Obtener nombres de usuarios que sugirieron
+const allUsers = USERS;
+const userIdToNameMap = new Map<string, string>();
+allUsers.forEach(user => {
+  userIdToNameMap.set(user.id, user.name);
+});
+
+// anexar conteos y sugerencias manuales a cada sugerencia
+const suggestionsWithVotes = suggestions.map(s => {
+  const suggestedByUserIds = suggestedByMap[s.id] || [];
+  const suggestedByNames = suggestedByUserIds
+    .map(userId => userIdToNameMap.get(userId) || `Usuario ${userId.replace('u', '')}`)
+    .filter(Boolean);
+  
+  return {
+    ...s,
+    votes: { ...(voteCounts[s.id] ?? { up: 0, down: 0 }) },
+    myVote: viewerUserId ? myVotes[s.id] ?? null : null,
+    suggestedBy: suggestedByUserIds.length > 0 ? suggestedByUserIds : null,
+    suggestedByNames: suggestedByNames.length > 0 ? suggestedByNames : null,
+    isManuallySuggested: suggestedByUserIds.length > 0
+  };
+});
+
+// Agregar restaurantes sugeridos manualmente que no pasan el filtro estricto
+const manuallySuggestedIds = Object.keys(suggestedByMap);
+const manuallySuggestedRestaurants = restaurants.filter(r => manuallySuggestedIds.includes(r.id) && !filtered.some(f => f.id === r.id));
+
+for (const restaurant of manuallySuggestedRestaurants) {
+  const suggestedByUserIds = suggestedByMap[restaurant.id] || [];
+  const suggestedByNames = suggestedByUserIds
+    .map(userId => userIdToNameMap.get(userId) || `Usuario ${userId.replace('u', '')}`)
+    .filter(Boolean);
+  
+  const { score, motivos } = explain(restaurant);
+  const slots = availabilityByRestaurant[restaurant.id] ?? [];
+  
+  suggestionsWithVotes.push({
+    ...restaurant,
+    matchScore: score,
+    motivos,
+    availabilityForDate: dateStr ? { date: dateStr, slots } : null,
+    reservableAtTime: dateStr && timeStr ? { time: timeStr, ok: slots.some(s => s.slot === timeStr) } : null,
+    votes: { ...(voteCounts[restaurant.id] ?? { up: 0, down: 0 }) },
+    myVote: viewerUserId ? myVotes[restaurant.id] ?? null : null,
+    suggestedBy: suggestedByUserIds.length > 0 ? suggestedByUserIds : null,
+    suggestedByNames: suggestedByNames.length > 0 ? suggestedByNames : null,
+    isManuallySuggested: true
+  });
+}
 
 return res.json({
   group: g,
   members,
   consideredPreferences: merged,
-  suggestions: suggestionsWithVotes,
+  suggestions: suggestionsWithVotes.sort((a, b) => {
+    // Primero las sugeridas manualmente, luego por score
+    if (a.isManuallySuggested && !b.isManuallySuggested) return -1;
+    if (!a.isManuallySuggested && b.isManuallySuggested) return 1;
+    return b.matchScore - a.matchScore;
+  }),
   limit: g.limit,
   remainingSeats: g.limit - g.members.length,
   voteSummary: voteCounts
@@ -481,7 +554,7 @@ app.get("/group-view/all/:userId", async (req: Request, res: Response) => {
       budgetMax: Math.min(...memberPrefs.map(p => p.budgetMax ?? Infinity))
     };
 
-    const suggestions = restaurants.filter(r => {
+    const filtered = restaurants.filter(r => {
       if (merged.dietary?.includes("celiac") && !r.accessibility.includes("gluten-free")) return false;
       if (merged.dietary?.includes("vegetarian")) {
         const isVeg = r.accessibility.includes("vegetarian") || r.cuisines.includes("Vegetariana");
@@ -495,11 +568,66 @@ app.get("/group-view/all/:userId", async (req: Request, res: Response) => {
       return true;
     });
 
+    // Obtener sugerencias manuales de este grupo
+    const groupSuggestions = SUGGESTIONS.filter(s => s.groupId === g.id);
+    const suggestedByMap: Record<string, string[]> = {};
+    for (const suggestion of groupSuggestions) {
+      if (!suggestedByMap[suggestion.restaurantId]) {
+        suggestedByMap[suggestion.restaurantId] = [];
+      }
+      suggestedByMap[suggestion.restaurantId].push(suggestion.userId);
+    }
+
+    // Obtener nombres de usuarios
+    const userIdToNameMap = new Map<string, string>();
+    USERS.forEach(user => {
+      userIdToNameMap.set(user.id, user.name);
+    });
+
+    // Agregar información de sugerencias manuales
+    const suggestions = filtered.map(r => {
+      const suggestedByUserIds = suggestedByMap[r.id] || [];
+      const suggestedByNames = suggestedByUserIds
+        .map(userId => userIdToNameMap.get(userId) || `Usuario ${userId.replace('u', '')}`)
+        .filter(Boolean);
+      
+      return {
+        ...r,
+        suggestedBy: suggestedByUserIds.length > 0 ? suggestedByUserIds : null,
+        suggestedByNames: suggestedByNames.length > 0 ? suggestedByNames : null,
+        isManuallySuggested: suggestedByUserIds.length > 0
+      };
+    });
+
+    // Agregar restaurantes sugeridos manualmente que no pasan el filtro
+    const manuallySuggestedIds = Object.keys(suggestedByMap);
+    const manuallySuggestedRestaurants = restaurants.filter(r => 
+      manuallySuggestedIds.includes(r.id) && !filtered.some(f => f.id === r.id)
+    );
+
+    for (const restaurant of manuallySuggestedRestaurants) {
+      const suggestedByUserIds = suggestedByMap[restaurant.id] || [];
+      const suggestedByNames = suggestedByUserIds
+        .map(userId => userIdToNameMap.get(userId) || `Usuario ${userId.replace('u', '')}`)
+        .filter(Boolean);
+      
+      suggestions.push({
+        ...restaurant,
+        suggestedBy: suggestedByUserIds.length > 0 ? suggestedByUserIds : null,
+        suggestedByNames: suggestedByNames.length > 0 ? suggestedByNames : null,
+        isManuallySuggested: true
+      });
+    }
+
     return {
       group: g,
       members,
       consideredPreferences: merged,
-      suggestions,
+      suggestions: suggestions.sort((a, b) => {
+        if (a.isManuallySuggested && !b.isManuallySuggested) return -1;
+        if (!a.isManuallySuggested && b.isManuallySuggested) return 1;
+        return 0;
+      }),
       limit: g.limit,
       remainingSeats: g.limit - g.members.length
     };
@@ -534,6 +662,57 @@ app.post("/groups/:groupId/votes", (req: Request, res: Response) => {
   VOTES.push({ groupId, userId, restaurantId, value: value as VoteValue, votedAt: new Date().toISOString() });
 
   return res.status(201).json({ message: "Voto registrado", groupId, userId, restaurantId, value });
+});
+
+// 👉 Sugerir un restaurante a un grupo
+app.post("/groups/:groupId/suggest", async (req: Request, res: Response) => {
+  const schema = z.object({
+    userId: z.string(),
+    restaurantId: z.string()
+  });
+  const parsed = schema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json(parsed.error.flatten());
+
+  const { groupId } = req.params;
+  const { userId, restaurantId } = parsed.data;
+
+  const g = GROUPS.find(x => x.id === groupId);
+  if (!g) return res.status(404).json({ error: "Grupo no encontrado" });
+  if (!g.members.includes(userId)) return res.status(403).json({ error: "El usuario no pertenece al grupo" });
+
+  // Verificar que el restaurante existe
+  const restaurant = await prisma.restaurant.findUnique({ where: { id: restaurantId } });
+  if (!restaurant) return res.status(404).json({ error: "Restaurante no encontrado" });
+
+  // Evitar duplicados (mismo usuario, mismo grupo, mismo restaurante)
+  const exists = SUGGESTIONS.some(
+    s => s.groupId === groupId && s.userId === userId && s.restaurantId === restaurantId
+  );
+  if (exists) {
+    return res.status(409).json({ message: "Ya has sugerido este restaurante en este grupo" });
+  }
+
+  // Agregar sugerencia
+  SUGGESTIONS.push({
+    groupId,
+    userId,
+    restaurantId,
+    suggestedAt: new Date().toISOString()
+  });
+
+  // Obtener nombre del usuario para la respuesta
+  const user = USERS.find(u => u.id === userId);
+  const userName = user?.name || `Usuario ${userId.replace('u', '')}`;
+
+  return res.status(201).json({
+    message: "Restaurante sugerido exitosamente",
+    groupId,
+    userId,
+    userName,
+    restaurantId,
+    restaurantName: restaurant.name,
+    suggestedAt: SUGGESTIONS[SUGGESTIONS.length - 1].suggestedAt
+  });
 });
 
 // 👉 Quitar voto (opcional)
@@ -622,6 +801,24 @@ app.post("/groups/:groupId/reserve", async (req: Request, res: Response) => {
     return res.status(400).json({ error: "Falta fecha u hora para reservar" });
   }
 
+  const restaurant = await prisma.restaurant.findUnique({
+    where: { id: restaurantId },
+    select: {
+      id: true,
+      name: true,
+      cuisines: true,
+      avgPrice: true,
+      location: true,
+      noiseLevel: true,
+      accessibility: true,
+      photoUrl: true
+    }
+  });
+
+  if (!restaurant) {
+    return res.status(404).json({ error: "Restaurante no encontrado" });
+  }
+
   // normalizar fecha a 00:00 UTC (igual que seed)
   const normalized = new Date(Date.UTC(
     Number(dateStr.slice(0, 4)),
@@ -629,12 +826,34 @@ app.post("/groups/:groupId/reserve", async (req: Request, res: Response) => {
     Number(dateStr.slice(8, 10))
   ));
 
-  // verificar slot
-  const availability = await prisma.availability.findFirst({
+  // Buscar o crear disponibilidad para esa fecha/hora
+  let availability = await prisma.availability.findFirst({
     where: { restaurantId, date: normalized, slot: timeStr }
   });
-  if (!availability) return res.status(400).json({ error: "Sin disponibilidad para esa fecha/hora" });
-  if (partySize > availability.capacity) return res.status(400).json({ error: "Capacidad insuficiente" });
+  
+  // Si no existe disponibilidad, crearla automáticamente con capacidad suficiente
+  if (!availability) {
+    // Capacidad por defecto: tamaño del grupo + 5 lugares adicionales (mínimo 10)
+    const defaultCapacity = Math.max(partySize + 5, 10);
+    availability = await prisma.availability.create({
+      data: {
+        restaurantId,
+        date: normalized,
+        slot: timeStr,
+        capacity: defaultCapacity
+      }
+    });
+  }
+  
+  // Verificar capacidad
+  if (partySize > availability.capacity) {
+    // Si no hay suficiente capacidad, aumentar la capacidad automáticamente
+    await prisma.availability.update({
+      where: { id: availability.id },
+      data: { capacity: partySize + 5 } // Asegurar capacidad suficiente + margen
+    });
+    availability.capacity = partySize + 5;
+  }
 
   // crear reserva y descontar capacidad
   const reservation = await prisma.reservation.create({
@@ -646,11 +865,17 @@ app.post("/groups/:groupId/reserve", async (req: Request, res: Response) => {
     data: { capacity: availability.capacity - partySize }
   });
 
-  return res.status(201).json({
-    message: "Reserva creada para el grupo",
-    reservation,
-    remainingCapacity: availability.capacity - partySize
-  });
+  g.reservation = {
+    id: reservation.id,
+    restaurantId,
+    date: dateStr,
+    time: timeStr,
+    note,
+    partySize,
+    restaurant
+  };
+
+  return res.status(201).json(g);
 });
 
 // Registrar nuevo usuario

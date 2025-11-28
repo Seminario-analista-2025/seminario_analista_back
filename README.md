@@ -44,8 +44,22 @@ Contenido por defecto:
 ```
 NODE_ENV=development
 PORT=3000
+
+# Database Configuration
 DATABASE_URL=postgresql://app:app@localhost:5432/app?schema=public
+POSTGRES_USER=app
+POSTGRES_PASSWORD=app
+POSTGRES_DB=app
+POSTGRES_PORT=5432
+
+# CORS Configuration (comma-separated list of allowed origins)
+CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+
+# API Base URL (for console logging)
+API_BASE_URL=http://localhost:3000
 ```
+
+> **Nota:** Las variables `POSTGRES_*` se usan en `docker-compose.yml`. Si cambias estas variables, asegúrate de actualizar también `DATABASE_URL` para que coincidan.
 
 ### 4️⃣ Levantar la base de datos (Docker)
 
@@ -199,7 +213,7 @@ seminario_analista_back/
 
 ### ❌ Puerto 5432 ocupado
 
-Cambiar el puerto en `docker-compose.yml` y en `.env` (por ejemplo, 5433).
+Cambiar el puerto en `.env` configurando `POSTGRES_PORT=5433` (o el puerto que prefieras). También actualiza `DATABASE_URL` para reflejar el nuevo puerto: `postgresql://app:app@localhost:5433/app?schema=public`
 
 ### ❌ Error de migración Prisma
 
